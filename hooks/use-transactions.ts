@@ -15,6 +15,8 @@ export function useTransactions() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchTransactions = async () => {
       try {
         const response = await fetch('http://45.64.99.242:9116/users', {
@@ -30,29 +32,39 @@ export function useTransactions() {
 
         const data = await response.json();
 
-        const formattedTransactions = data.data.map((user: Transaction) => ({
-          username: user.username,
-          count_transactions: user.count_transactions,
-        }));
+        if (isMounted) {
+          const formattedTransactions = data.data.map((user: Transaction) => ({
+            username: user.username,
+            count_transactions: user.count_transactions,
+          }));
 
-        setTransactions(formattedTransactions);
+          setTransactions(formattedTransactions);
 
-        const total = formattedTransactions.reduce(
-            (acc: number, curr: Transaction) => acc + curr.count_transactions,
-            0
-        );
-        setTotalRevenue(total);
-        setError(null);
+          const total = formattedTransactions.reduce(
+              (acc: number, curr: Transaction) => acc + curr.count_transactions,
+              0
+          );
+          setTotalRevenue(total);
+          setError(null);
+        }
       } catch (err) {
-        setError('Failed to fetch transactions. Please try again later.');
-        setTransactions([]);
-        setTotalRevenue(0);
+        if (isMounted) {
+          setError('Failed to fetch transactions. Please try again later.');
+          setTransactions([]);
+          setTotalRevenue(0);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchTransactions();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return { transactions, totalRevenue, loading, error };

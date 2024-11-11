@@ -15,6 +15,8 @@ export function useProducts() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchProducts = async () => {
       try {
         const response = await fetch('http://45.64.99.242:9116/brands', {
@@ -29,19 +31,30 @@ export function useProducts() {
         }
 
         const data = await response.json();
-        setProducts(data.data);
-        setTotalProducts(data.data.length);
-        setError(null);
+
+        if (isMounted) {
+          setProducts(data.data);
+          setTotalProducts(data.data.length);
+          setError(null);
+        }
       } catch (err) {
-        setError('Failed to fetch products. Please try again later.');
-        setProducts([]);
-        setTotalProducts(0);
+        if (isMounted) {
+          setError('Failed to fetch products. Please try again later.');
+          setProducts([]);
+          setTotalProducts(0);
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProducts();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return { products, totalProducts, loading, error };
