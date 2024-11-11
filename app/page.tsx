@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {Progress} from "@/components/ui/progress";
 
 export default function TransactionsPage() {
   const { transactions, totalRevenue, loading, error } = useTransactions();
@@ -23,8 +24,10 @@ export default function TransactionsPage() {
         </div>
         <div className="grid gap-4 md:grid-cols-1">
           <Card className="w-full h-[140px] animate-pulse bg-muted" />
+            <Progress value={undefined} className="w-full h-10px" />
         </div>
         <Card className="w-full h-[500px] animate-pulse bg-muted" />
+          <Progress value={undefined} className="w-full h-10px" />
       </div>
     );
   }
