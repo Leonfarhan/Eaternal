@@ -29,10 +29,17 @@ export function useTransactions() {
         }
 
         const data = await response.json();
-        setTransactions(data.data);
-        const total = data.data.reduce(
-          (acc: number, curr: Transaction) => acc + curr.count_transactions,
-          0
+
+        const formattedTransactions = data.data.map((user: Transaction) => ({
+          username: user.username,
+          count_transactions: user.count_transactions,
+        }));
+
+        setTransactions(formattedTransactions);
+
+        const total = formattedTransactions.reduce(
+            (acc: number, curr: Transaction) => acc + curr.count_transactions,
+            0
         );
         setTotalRevenue(total);
         setError(null);
