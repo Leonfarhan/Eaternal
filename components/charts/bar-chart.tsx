@@ -38,7 +38,7 @@ export function BarChart({ data, xKey, yKey }: BarChartProps) {
         <Tooltip />
         <Bar
           dataKey={yKey}
-          fill="hsl(var(--primary))"
+          fill="#2563eb"
           radius={[4, 4, 0, 0]}
         />
       </RechartsBarChart>
