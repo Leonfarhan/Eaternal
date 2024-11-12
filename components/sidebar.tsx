@@ -26,11 +26,11 @@ export function Sidebar() {
   return (
     <div className="space-y-4 py-4 flex flex-col h-full bg-gradient-to-b from-[rgba(20,136,204,1)] to-[rgba(43,50,178,1)] text-white">
       <div className="px-3 py-2 flex-1">
-        <Link href="/" className="flex items-center pl-3 mb-14">
+        <div className="flex items-center pl-3 mb-14">
           <h1 className="text-2xl font-bold">
             Eaternal
           </h1>
-        </Link>
+        </div>
         <div className="space-y-1">
           {routes.map((route) => (
             <Link
