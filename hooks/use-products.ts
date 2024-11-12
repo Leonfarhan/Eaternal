@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 
 export interface Product {
-  id: number;
   name: string;
   count_sold: number;
 }
@@ -15,7 +14,7 @@ export function useProducts() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
+    const abortController = new AbortController();
 
     const fetchProducts = async () => {
       try {
@@ -24,6 +23,7 @@ export function useProducts() {
           headers: {
             'Accept': 'application/json',
           },
+          signal: abortController.signal,
         });
 
         if (!response.ok) {
@@ -32,19 +32,20 @@ export function useProducts() {
 
         const data = await response.json();
 
-        if (isMounted) {
-          setProducts(data.data);
-          setTotalProducts(data.data.length);
-          setError(null);
-        }
-      } catch (err) {
-        if (isMounted) {
+        const formattedProducts = data.data.map((product: any) => ({
+          name: product.name,
+          count_sold: product.count_sold,
+        }));
+
+        setProducts(formattedProducts);
+        setTotalProducts(formattedProducts.length);
+        setError(null);
+        setLoading(false);
+      } catch (err: any) { // Type assertion untuk error handling
+        if (err.name !== 'AbortError') {
           setError('Failed to fetch products. Please try again later.');
           setProducts([]);
           setTotalProducts(0);
-        }
-      } finally {
-        if (isMounted) {
           setLoading(false);
         }
       }
@@ -53,7 +54,7 @@ export function useProducts() {
     fetchProducts();
 
     return () => {
-      isMounted = false;
+      abortController.abort();
     };
   }, []);
 

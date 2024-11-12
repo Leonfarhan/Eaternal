@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 
 export interface Transaction {
-  id: number;
   username: string;
   count_transactions: number;
 }
@@ -15,7 +14,7 @@ export function useTransactions() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
+    const abortController = new AbortController();
 
     const fetchTransactions = async () => {
       try {
@@ -24,6 +23,7 @@ export function useTransactions() {
           headers: {
             'Accept': 'application/json',
           },
+          signal: abortController.signal,
         });
 
         if (!response.ok) {
@@ -32,29 +32,21 @@ export function useTransactions() {
 
         const data = await response.json();
 
-        if (isMounted) {
-          const formattedTransactions = data.data.map((user: Transaction) => ({
-            username: user.username,
-            count_transactions: user.count_transactions,
-          }));
+        const formattedTransactions = data.data.map((user: any) => ({
+          username: user.username,
+          count_transactions: user.count_transactions,
+        }));
 
-          setTransactions(formattedTransactions);
-
-          const total = formattedTransactions.reduce(
-              (acc: number, curr: Transaction) => acc + curr.count_transactions,
-              0
-          );
-          setTotalRevenue(total);
-          setError(null);
-        }
-      } catch (err) {
-        if (isMounted) {
+        setTransactions(formattedTransactions);
+        const total = formattedTransactions.reduce((acc: number, curr: Transaction) => acc + curr.count_transactions, 0);
+        setTotalRevenue(total);
+        setError(null);
+        setLoading(false);
+      } catch (err: any) { // Type assertion untuk menghindari error type
+        if (err.name !== 'AbortError') {
           setError('Failed to fetch transactions. Please try again later.');
           setTransactions([]);
           setTotalRevenue(0);
-        }
-      } finally {
-        if (isMounted) {
           setLoading(false);
         }
       }
@@ -63,7 +55,7 @@ export function useTransactions() {
     fetchTransactions();
 
     return () => {
-      isMounted = false;
+      abortController.abort();
     };
   }, []);
 
