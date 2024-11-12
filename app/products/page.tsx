@@ -52,7 +52,7 @@ export default function ProductsPage() {
         <StatsCard
           title="Total Products"
           value={totalProducts}
-          icon={<Package className="h-4 w-4 text-muted-foreground" />}
+          icon={<Package className="h-auto w-6 text-white bg-black rounded-full p-1" />}
         />
       </div>
 

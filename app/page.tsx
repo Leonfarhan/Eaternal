@@ -57,7 +57,7 @@ export default function TransactionsPage() {
                 <StatsCard
                     title="Total Revenue"
                     value={totalRevenue}
-                    icon={<DollarSign className="h-4 w-4 text-muted-foreground" />}
+                    icon={<DollarSign className="h-auto w-6 text-white bg-black rounded-full p-1" />}
                 />
             </div>
 
